@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id          String   @id @default(cuid())
+  defaultCost Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum InsuranceStatus {
+  DONE
+  DONE_NOT_PAID
+  NOT_DONE
+}
+
+model InsuranceEntry {
+  id            String          @id @default(cuid())
+  clientName    String
+  candidateName String
+  cost          Float
+  sellingPrice  Float
+  status        InsuranceStatus @default(NOT_DONE)
+  isFree        Boolean         @default(false)
+  expiryDate    DateTime
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}

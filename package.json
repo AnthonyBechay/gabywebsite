@@ -1,0 +1,24 @@
+{
+  "name": "jobline",
+  "version": "1.0.0",
+  "description": "Jobline - Insurance Management Platform",
+  "private": true,
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev": "pnpm dev:backend & pnpm dev:frontend",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "db:push": "pnpm --filter backend db:push",
+    "db:seed": "pnpm --filter backend db:seed",
+    "db:generate": "pnpm --filter backend db:generate"
+  },
+  "packageManager": "pnpm@10.26.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "esbuild"
+    ]
+  }
+}
