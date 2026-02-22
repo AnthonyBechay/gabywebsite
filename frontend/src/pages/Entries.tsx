@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Modal } from '../components/Modal';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, Download } from 'lucide-react';
 
 interface Entry {
   id: string;
@@ -54,6 +54,32 @@ export function Entries() {
   const [defaultCost, setDefaultCost] = useState(0);
 
   const load = () => api.getEntries().then(setEntries);
+
+  const exportCsv = () => {
+    const escape = (val: string | number | boolean | null | undefined) => {
+      const s = val == null ? '' : String(val);
+      return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ['Client Name', 'Candidate Name', 'Cost', 'Selling Price', 'Status', 'Free', 'Expiry Date', 'Notes', 'Created At'];
+    const rows = entries.map((e) => [
+      escape(e.clientName),
+      escape(e.candidateName),
+      escape(e.cost),
+      escape(e.isFree ? 'Free' : e.sellingPrice),
+      escape(e.status === 'DONE' ? 'Done' : e.status === 'DONE_NOT_PAID' ? 'Done Not Paid' : 'Not Done'),
+      escape(e.isFree ? 'Yes' : 'No'),
+      escape(new Date(e.expiryDate).toLocaleDateString()),
+      escape(e.notes),
+    ].join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'insurances.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     load();
@@ -111,9 +137,14 @@ export function Entries() {
           <h1 className="page-title">Insurance Entries</h1>
           <p className="page-subtitle">{entries.length} total entries</p>
         </div>
-        <button className="btn btn-primary" onClick={openNew}>
-          <Plus size={16} /> Add Entry
-        </button>
+        <div className="btn-group">
+          <button className="btn btn-secondary" onClick={exportCsv} disabled={entries.length === 0} title="Export all entries as CSV">
+            <Download size={16} /> Export CSV
+          </button>
+          <button className="btn btn-primary" onClick={openNew}>
+            <Plus size={16} /> Add Entry
+          </button>
+        </div>
       </div>
 
       <div className="card">
