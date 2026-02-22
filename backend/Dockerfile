@@ -15,6 +15,9 @@ COPY backend/src ./src
 COPY backend/tsconfig.json ./
 RUN npx tsc
 
+# Compile seed.ts to seed.js so it can run in production
+RUN npx tsc prisma/seed.ts --esModuleInterop --skipLibCheck --outDir prisma --resolveJsonModule
+
 # Build frontend
 WORKDIR /frontend-build
 COPY frontend/package.json ./
